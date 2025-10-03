@@ -12,7 +12,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "db:seed": "ts-node src/scripts/seed.ts",
-    "db:migrate": "ts-node src/scripts/migrate.ts",
+    "db:migrate": "ts-node src/scripts/migrate.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
