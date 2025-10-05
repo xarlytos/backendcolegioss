@@ -668,23 +668,11 @@ export class ContactosController {
   // GET /contactos/colegios - Obtener todos los colegios únicos
   static async getColegios(req: AuthRequest, res: Response) {
     try {
-      // Primero intentar obtener de la tabla de colegios
-      const colegiosFromTable = await Colegio.find({ activo: true }).select('nombre').lean();
-      
-      if (colegiosFromTable.length > 0) {
-        const nombresColegios = colegiosFromTable.map(colegio => colegio.nombre);
-        res.json({
-          success: true,
-          data: {
-            colegios: nombresColegios.sort()
-          }
-        });
-        return;
-      }
-      
-      // Si no hay colegios en la tabla, obtener de contactos como fallback
+      // Obtener colegios únicos de la tabla de contactos (donde están los datos reales)
       const colegiosFromContacts = await Contacto.distinct('nombreColegio');
       const colegiosLista = colegiosFromContacts.filter(colegio => colegio && colegio.trim() !== '');
+      
+      console.log('🔍 Colegios encontrados en contactos:', colegiosLista);
       
       res.json({
         success: true,
