@@ -188,9 +188,9 @@ export class ContactosController {
         comercialId: comercialId || req.user!.userId,
         createdBy: req.user!.userId,
         diaLibre, // ← Mantener este campo
-        universidadId,
-        titulacionId,
-        curso
+        ...(universidadId && { universidadId }),
+        ...(titulacionId && { titulacionId }),
+        ...(curso && { curso })
       });
 
       await nuevoContacto.save();
