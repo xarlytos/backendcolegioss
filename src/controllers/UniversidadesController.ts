@@ -955,7 +955,7 @@ console.log('🗺️ Jerarquía cache creado:', jerarquiaCache.size, 'relaciones
         const ejemplosLocalidades = universidades.slice(0, 5).map(u => ({
           nombre: u.nombre,
           ciudad: u.ciudad,
-          ciudadNormalizada: this.normalizeName(u.ciudad || '')
+          ciudadNormalizada: UniversidadesController.normalizeName(u.ciudad || '')
         }));
         console.log('📋 Ejemplos de localidades a procesar:', ejemplosLocalidades);
         
@@ -966,7 +966,7 @@ console.log('🗺️ Jerarquía cache creado:', jerarquiaCache.size, 'relaciones
         for (const universidad of universidades) {
           try {
             const localidadAnterior = universidad.ciudad || '';
-            const localidadNormalizada = this.normalizeName(localidadAnterior);
+            const localidadNormalizada = UniversidadesController.normalizeName(localidadAnterior);
             
             // Solo actualizar si la localidad cambió al normalizar
             if (localidadAnterior !== localidadNormalizada && localidadNormalizada !== '') {
