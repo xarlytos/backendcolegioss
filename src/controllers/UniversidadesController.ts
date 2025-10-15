@@ -218,8 +218,12 @@ export class UniversidadesController {
     try {
       const { codigo, nombre, tipo, ciudad, activa } = req.body;
 
+      console.log('🔍 Datos recibidos para crear universidad:', { codigo, nombre, tipo, ciudad, activa });
+      console.log('🔍 Usuario que hace la petición:', { userId: req.user?.userId, rol: req.user?.rol });
+
       // Solo admins pueden crear universidades
       if (req.user?.rol !== RolUsuario.ADMIN) {
+        console.log('❌ Usuario no es administrador:', req.user?.rol);
         return res.status(403).json({ 
           error: 'No tienes permisos para crear universidades' 
         });
@@ -227,6 +231,7 @@ export class UniversidadesController {
 
       // Validaciones
       if (!codigo || !nombre || !tipo || !ciudad) {
+        console.log('❌ Validación fallida - Campos faltantes:', { codigo, nombre, tipo, ciudad });
         return res.status(400).json({ 
           error: 'Código, nombre, tipo y ciudad son obligatorios' 
         });
@@ -249,14 +254,18 @@ export class UniversidadesController {
       console.log('✅ Usuario es administrador, continuando...');
 
       // Verificar que el código no exista
+      console.log('🔍 Verificando si el código ya existe:', codigo);
       const universidadExistente = await Universidad.findOne({ codigo });
       if (universidadExistente) {
+        console.log('❌ Código ya existe:', universidadExistente.nombre);
         return res.status(400).json({ 
           error: 'Ya existe una universidad con este código' 
         });
       }
+      console.log('✅ Código disponible');
 
       // Crear universidad
+      console.log('🔍 Creando nueva universidad con datos:', { codigo, nombre, tipo, ciudad });
       const nuevaUniversidad = new Universidad({
         codigo,
         nombre,
@@ -266,7 +275,9 @@ export class UniversidadesController {
         creadoPor: new mongoose.Types.ObjectId(req.user.userId)
       });
 
+      console.log('💾 Guardando universidad en la base de datos...');
       await nuevaUniversidad.save();
+      console.log('✅ Universidad guardada exitosamente:', nuevaUniversidad._id);
 
       // NUEVO: Asociar contactos existentes con el mismo nombre normalizado
       console.log('🔍 Buscando contactos para asociar con el nuevo colegio...');
@@ -307,13 +318,26 @@ export class UniversidadesController {
         }
       });
 
+      console.log('📤 Enviando respuesta exitosa');
       res.status(201).json({ 
         message: 'Colegio creado exitosamente',
         universidad: nuevaUniversidad,
         contactosAsociados: contactosAsociados.length
       });
-    } catch (error) {
-      console.error('Error al crear universidad:', error);
+    } catch (error: any) {
+      console.error('❌ Error al crear universidad:', error);
+      console.error('❌ Error stack:', error.stack);
+      console.error('❌ Error name:', error.name);
+      console.error('❌ Error message:', error.message);
+      
+      // Check if it's a duplicate key error
+      if (error.code === 11000) {
+        console.log('❌ Error de clave duplicada detectado');
+        return res.status(400).json({ 
+          error: 'Ya existe una universidad con este código o nombre' 
+        });
+      }
+      
       res.status(500).json({ error: 'Error interno del servidor' });
     }
   }
