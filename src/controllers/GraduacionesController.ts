@@ -241,13 +241,13 @@ export class GraduacionesController {
           creadoPor: new Types.ObjectId(req.user!.userId)
         });
       } else {
-        // Actualizar campos existentes
-        graduacion.responsable = responsable || graduacion.responsable;
-        graduacion.tipoProducto = tipoProducto || graduacion.tipoProducto;
-        graduacion.producto = producto ? new Types.ObjectId(producto) : graduacion.producto;
-        graduacion.prevision = prevision || graduacion.prevision;
-        graduacion.estado = estado || graduacion.estado;
-        graduacion.observaciones = observaciones || graduacion.observaciones;
+        // Actualizar campos existentes - permitir valores vacíos
+        if (responsable !== undefined) graduacion.responsable = responsable;
+        if (tipoProducto !== undefined) graduacion.tipoProducto = tipoProducto;
+        if (producto !== undefined) graduacion.producto = producto ? new Types.ObjectId(producto) : undefined;
+        if (prevision !== undefined) graduacion.prevision = prevision;
+        if (estado !== undefined) graduacion.estado = estado;
+        if (observaciones !== undefined) graduacion.observaciones = observaciones;
         graduacion.actualizadoPor = new Types.ObjectId(req.user!.userId);
       }
 
